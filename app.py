@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 from datetime import datetime
+from zoneinfo import ZoneInfo  # 👈 Add this import
 
 st.title("Inbound Monitoring Form")
 
@@ -59,7 +60,9 @@ if "searched_po" in st.session_state and "selected_db" in st.session_state:
             qty_dict[item] = qty
 
         if st.button("Submit"):
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # Get current time in GMT+7
+            timestamp = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%Y-%m-%d %H:%M:%S")
+            
             payload = {
                 "entries": [
                     {
