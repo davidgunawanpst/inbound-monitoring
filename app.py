@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # -- CONFIGURE YOUR GOOGLE SHEET HERE --
 SHEET_ID = "1viV03CJxPsK42zZyKI6ZfaXlLR62IbC0O3Lbi_hfGRo"
@@ -50,7 +51,7 @@ for item in selected_items:
 
 # Step 4: Submit
 if st.button("Submit"):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%Y-%m-%d %H:%M:%S")
     payload = {
         "entries": [
             {
