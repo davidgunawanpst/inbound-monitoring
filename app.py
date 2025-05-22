@@ -73,7 +73,7 @@ if st.button("Submit"):
         "images": [
             {
                 "filename": file.name,
-                "content": base64.b64encode(file.read()).decode("utf-8")
+                "content": base64.b64encode(file.getvalue()).decode("utf-8")  # <-- FIXED
             }
             for file in uploaded_files
         ]
