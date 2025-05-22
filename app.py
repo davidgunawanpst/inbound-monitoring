@@ -7,7 +7,7 @@ import base64
 
 # -- CONFIGURE YOUR GOOGLE SHEET HERE --
 SHEET_ID = "1viV03CJxPsK42zZyKI6ZfaXlLR62IbC0O3Lbi_hfGRo"
-SHEET_NAME = "Master"
+SHEET_NAME = "Master"  # or whatever tab name
 CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={SHEET_NAME}"
 
 # -- Load data from Google Sheet --
@@ -50,40 +50,44 @@ for item in selected_items:
     qty = st.number_input(f"Qty received for {item}", min_value=0, step=1, key=f"qty_{item}")
     qty_dict[item] = qty
 
-# Step 4: Upload Photos
+# Step 4: Upload Photos (accept multiple files)
 uploaded_files = st.file_uploader("Upload photos (unlimited):", accept_multiple_files=True, type=["jpg", "jpeg", "png"])
 
 # Step 5: Submit
 if st.button("Submit"):
-    timestamp = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%Y-%m-%d_%H-%M-%S")
-    folder_name = f"{selected_db}_{selected_po}_{timestamp}"
+    if len(qty_dict) == 0 or all(q == 0 for q in qty_dict.values()):
+        st.error("Please enter quantity for at least one item.")
+    else:
+        timestamp = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%Y-%m-%d_%H-%M-%S")
+        folder_name = f"{selected_db}_{selected_po}_{timestamp}"
 
-    payload = {
-        "folder_name": folder_name,
-        "entries": [
-            {
-                "timestamp": timestamp,
-                "database": selected_db,
-                "po_number": selected_po,
-                "item": item,
-                "quantity": qty
-            }
-            for item, qty in qty_dict.items() if qty > 0
-        ],
-        "images": [
-            {
-                "filename": file.name,
-                "content": base64.b64encode(file.getvalue()).decode("utf-8")  # <-- FIXED
-            }
-            for file in uploaded_files
-        ]
-    }
+        # Prepare payload
+        payload = {
+            "folder_name": folder_name,
+            "entries": [
+                {
+                    "timestamp": timestamp,
+                    "database": selected_db,
+                    "po_number": selected_po,
+                    "item": item,
+                    "quantity": qty
+                }
+                for item, qty in qty_dict.items() if qty > 0
+            ],
+            "images": [
+                {
+                    "filename": file.name,
+                    "content": base64.b64encode(file.read()).decode("utf-8")
+                }
+                for file in uploaded_files
+            ]
+        }
 
-    try:
-        response = requests.post(WEBHOOK_URL, json=payload)
-        if response.status_code == 200:
-            st.success("Data and photos submitted successfully!")
-        else:
-            st.error(f"Error {response.status_code}: {response.text}")
-    except Exception as e:
-        st.error(f"Submission failed: {e}")
+        try:
+            response = requests.post(WEBHOOK_URL, json=payload)
+            if response.status_code == 200:
+                st.success("Data and photos submitted successfully!")
+            else:
+                st.error(f"Error {response.status_code}: {response.text}")
+        except Exception as e:
+            st.error(f"Submission failed: {e}")
