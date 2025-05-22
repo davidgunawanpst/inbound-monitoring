@@ -29,7 +29,7 @@ def load_po_data():
 database_data = load_po_data()
 
 # --- Replace with your actual Apps Script Webhook URL ---
-WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyAIfvb09pm4_nLzUukwyGRLN_lG3ZzUyVrn2UCVkfmNDb59CC6M0WOmDLb0tlg1bUMnw/exec"
+WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyNEFforG4QJrZVJ5vRtLI2OAelO9ymO-qV8OqnzIHfVzU8TMUZdGVP5ot33utEPe7uBg/exec"
 
 # --- UI ---
 st.title("Inbound Monitoring Form")
